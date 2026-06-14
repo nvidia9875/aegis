@@ -27,6 +27,14 @@ export interface ReactorProps {
 const HEX = {
   heal: "#46e0d0", danger: "#ff5566", healthy: "#5cf0a8", orbit: "#ff9a3c", evolve: "#b08cff",
 } as const;
+
+// multi-stop palettes (low → high energy). Rich gradients, not a single hue.
+const PALETTES: Record<"heal" | "danger" | "healthy", [string, string, string, string]> = {
+  heal: ["#3a1d8a", "#1fb6d6", "#7ef0e0", "#fdfbff"], // indigo → cyan → aqua → white
+  danger: ["#5a0a14", "#ff2e4d", "#ff9a3c", "#fff2c0"], // crimson → red → orange → warm white (fire)
+  healthy: ["#0a5a3a", "#2bd47a", "#9ef6ff", "#fdfff8"], // teal → green → cyan → white
+};
+const GHOST: [string, string, string, string] = ["#2a1060", "#7b3ff5", "#c89bff", "#ffffff"];
 const ACCENT_CSS: Record<string, string> = {
   heal: "var(--color-heal)", evolve: "var(--color-evolve)", warn: "var(--color-orbit)",
   danger: "var(--color-danger)", healthy: "var(--color-healthy)",
@@ -119,32 +127,47 @@ void main(){
   gl_Position = projectionMatrix*viewMatrix*wp;
 }`;
 const CORE_FRAG = /* glsl */ `${SNOISE}
-uniform float uTime; uniform vec3 uColorA; uniform vec3 uColorB;
+uniform float uTime; uniform vec3 uC1; uniform vec3 uC2; uniform vec3 uC3; uniform vec3 uC4;
 varying vec3 vPos; varying vec3 vNormalW; varying vec3 vView;
+vec3 pal(float t){
+  t = clamp(t, 0.0, 1.0);
+  if(t < 0.34) return mix(uC1, uC2, t/0.34);
+  if(t < 0.67) return mix(uC2, uC3, (t-0.34)/0.33);
+  return mix(uC3, uC4, (t-0.67)/0.33);
+}
 void main(){
-  vec3 p = vPos*2.4; float t = uTime*0.35;
+  vec3 p = vPos*2.4; float t = uTime*0.32;
   vec3 q = vec3(fbm(p+t), fbm(p+vec3(5.2,1.3,2.7)-t), fbm(p+vec3(1.7,9.2,3.1)+t*0.5));
   float plasma = fbm(p + q*1.7 + t)*0.5 + 0.5;
-  vec3 col = mix(uColorA, uColorB, smoothstep(0.32,0.85,plasma));
-  col += vec3(1.0)*pow(max(plasma-0.72,0.0),2.0)*1.6;
-  float fres = pow(1.0 - max(dot(normalize(vNormalW), normalize(vView)),0.0), 2.2);
-  col += uColorB*fres*1.1;
-  gl_FragColor = vec4(col*1.65, 1.0);
+  float region = fbm(p*0.85 - t*0.25)*0.5 + 0.5;        // low-freq hue variation across surface
+  float tt = clamp(plasma*0.62 + region*0.52, 0.0, 1.0);
+  vec3 col = pal(tt);
+  col += vec3(1.0) * pow(max(plasma-0.82,0.0),2.0) * 1.3; // white-hot filaments
+  float fres = pow(1.0 - max(dot(normalize(vNormalW), normalize(vView)),0.0), 2.4);
+  col = mix(col, col + uC2*0.9, fres);                    // luminous rim (mid hue)
+  gl_FragColor = vec4(col*1.28, 1.0);
 }`;
 
-const WHITE = new THREE.Color("#ffffff");
-
-function PlasmaCore({ color }: { color: string }) {
+function PlasmaCore({ palette }: { palette: string[] }) {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uColorA: { value: new THREE.Color(color) }, uColorB: { value: new THREE.Color(color) } }),
+    () => ({
+      uTime: { value: 0 },
+      uC1: { value: new THREE.Color(palette[0]) },
+      uC2: { value: new THREE.Color(palette[1]) },
+      uC3: { value: new THREE.Color(palette[2]) },
+      uC4: { value: new THREE.Color(palette[3]) },
+    }),
     [],
   );
   useFrame((s) => {
     if (!mat.current) return;
-    mat.current.uniforms.uTime.value = s.clock.elapsedTime;
-    (mat.current.uniforms.uColorA.value as THREE.Color).set(color);
-    (mat.current.uniforms.uColorB.value as THREE.Color).set(color).lerp(WHITE, 0.6);
+    const u = mat.current.uniforms;
+    u.uTime.value = s.clock.elapsedTime;
+    (u.uC1.value as THREE.Color).set(palette[0]);
+    (u.uC2.value as THREE.Color).set(palette[1]);
+    (u.uC3.value as THREE.Color).set(palette[2]);
+    (u.uC4.value as THREE.Color).set(palette[3]);
   });
   return (
     <mesh>
@@ -156,30 +179,31 @@ function PlasmaCore({ color }: { color: string }) {
 
 // ── curl-flow particle corona (GPU shader points) ────────────────────────────
 const CORONA_VERT = /* glsl */ `${SNOISE}
-uniform float uTime; uniform float uSize; varying float vA;
+uniform float uTime; uniform float uSize; attribute float aHue; varying float vA; varying float vH;
 void main(){
   vec3 b = position; float t = uTime*0.25;
   vec3 off = vec3(snoise(b*1.6+vec3(t,0.0,0.0)), snoise(b*1.6+vec3(0.0,t,0.0)), snoise(b*1.6+vec3(0.0,0.0,t)))*0.18;
   float ang = t*0.7 + length(b)*1.4;
   vec3 p = b + off; float c = cos(ang); float s = sin(ang);
   p.xz = mat2(c,-s,s,c)*p.xz;
-  vA = 0.35 + 0.65*smoothstep(0.6,0.98,length(b));
+  vA = 0.35 + 0.65*smoothstep(0.6,0.98,length(b)); vH = aHue;
   vec4 mv = modelViewMatrix*vec4(p,1.0);
   gl_PointSize = clamp(uSize/(-mv.z), 1.0, 16.0);
   gl_Position = projectionMatrix*mv;
 }`;
 const CORONA_FRAG = /* glsl */ `
-precision mediump float; uniform vec3 uColor; varying float vA;
+precision mediump float; uniform vec3 uC1; uniform vec3 uC2; varying float vA; varying float vH;
 void main(){
   vec2 d = gl_PointCoord-0.5; float a = smoothstep(0.5,0.0,length(d));
-  gl_FragColor = vec4(uColor, a*vA);
+  gl_FragColor = vec4(mix(uC1, uC2, vH), a*vA);
 }`;
 
-function CurlCorona({ color }: { color: string }) {
+function CurlCorona({ c1, c2 }: { c1: string; c2: string }) {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const geo = useMemo(() => {
     const n = 900;
     const pos = new Float32Array(n * 3);
+    const hue = new Float32Array(n);
     for (let i = 0; i < n; i++) {
       const r = 0.62 + Math.random() * 0.36;
       const th = Math.random() * Math.PI * 2;
@@ -187,16 +211,19 @@ function CurlCorona({ color }: { color: string }) {
       pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
       pos[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th);
       pos[i * 3 + 2] = r * Math.cos(ph);
+      hue[i] = Math.random();
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    g.setAttribute("aHue", new THREE.BufferAttribute(hue, 1));
     return g;
   }, []);
-  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSize: { value: 46 }, uColor: { value: new THREE.Color(color) } }), []);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSize: { value: 46 }, uC1: { value: new THREE.Color(c1) }, uC2: { value: new THREE.Color(c2) } }), []);
   useFrame((s) => {
     if (mat.current) {
       mat.current.uniforms.uTime.value = s.clock.elapsedTime;
-      (mat.current.uniforms.uColor.value as THREE.Color).set(color);
+      (mat.current.uniforms.uC1.value as THREE.Color).set(c1);
+      (mat.current.uniforms.uC2.value as THREE.Color).set(c2);
     }
   });
   return (
@@ -230,18 +257,20 @@ function GlassShell({ color }: { color: string }) {
   );
 }
 
-function Core({ color, glass = true }: { color: string; glass?: boolean }) {
+function Core({ accent, ghost = false, glass = true }: { accent: "heal" | "danger" | "healthy"; ghost?: boolean; glass?: boolean }) {
+  const palette = ghost ? GHOST : PALETTES[accent];
+  const glow = palette[1];
   return (
     <group>
-      <PlasmaCore color={color} />
-      {glass && <GlassShell color={color} />}
-      <CurlCorona color={color} />
+      <PlasmaCore palette={palette} />
+      {glass && <GlassShell color={glow} />}
+      <CurlCorona c1={palette[1]} c2={palette[2]} />
       <mesh>
         <sphereGeometry args={[0.12, 16, 16]} />
-        <meshBasicMaterial color="#ffffff" toneMapped={false} />
+        <meshBasicMaterial color={palette[3]} toneMapped={false} />
       </mesh>
-      <Halo color={color} />
-      <pointLight color={color} intensity={9} distance={10} />
+      <Halo color={glow} />
+      <pointLight color={glow} intensity={9} distance={10} />
     </group>
   );
 }
@@ -273,7 +302,7 @@ function Orbit({ radius, count, color, speed }: { radius: number; count: number;
   );
 }
 
-function StageNodes({ stages, accent, accentHex }: { stages: ReactorStage[]; accent: string; accentHex: string }) {
+function StageNodes({ stages, accentHex }: { stages: ReactorStage[]; accentHex: string }) {
   const activeIndex = stages.findIndex((s) => s.active);
   return (
     <group rotation={[TILT, 0, 0]}>
@@ -344,27 +373,28 @@ function Burst({ trigger, color }: { trigger: number; color: string }) {
 }
 
 function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
-  const color = HEX[accent];
+  const pal = PALETTES[accent];
+  const glow = pal[1];
   const orbitCount = Math.min(48, 20 + antibodies * 6);
   return (
     <group>
       <group rotation={[TILT, 0, 0]}>
-        <Core color={color} />
-        <Ring radius={1.9} tube={0.012} color={color} speed={0.3} opacity={0.7} />
-        <Ring radius={RING_NODE} tube={0.022} color={color} speed={-0.18} opacity={0.85} />
+        <Core accent={accent} />
+        <Ring radius={1.9} tube={0.012} color={pal[2]} speed={0.3} opacity={0.7} />
+        <Ring radius={RING_NODE} tube={0.022} color={glow} speed={-0.18} opacity={0.85} />
         <Ring radius={2.95} tube={0.01} color={HEX.evolve} speed={0.12} opacity={0.5} />
         <Orbit radius={2.15} count={orbitCount} color={HEX.orbit} speed={0.5} />
         <Orbit radius={1.6} count={18} color={HEX.evolve} speed={-0.4} />
-        <Sparkles count={90} scale={6} size={3} speed={0.3} color={color} opacity={0.6} />
+        <Sparkles count={90} scale={6} size={3} speed={0.3} color={glow} opacity={0.6} />
         <group position={[0, 0, -2.6]} scale={0.6}>
-          <Core color={HEX.evolve} glass={false} />
+          <Core accent={accent} ghost glass={false} />
           <Ring radius={2.2} tube={0.016} color={HEX.evolve} speed={0.22} opacity={0.5} />
           <Orbit radius={1.9} count={20} color={HEX.orbit} speed={0.4} />
         </group>
       </group>
       <CoverageArc coverage={coverage} />
-      <StageNodes stages={stages} accent={accent} accentHex={color} />
-      <Burst trigger={antibodies} color={HEX.heal} />
+      <StageNodes stages={stages} accentHex={glow} />
+      <Burst trigger={antibodies} color={pal[2]} />
     </group>
   );
 }
@@ -374,17 +404,17 @@ function Floor() {
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.7, -1]}>
       <planeGeometry args={[70, 70]} />
       <MeshReflectorMaterial
-        mirror={0.45}
-        resolution={256}
-        blur={[400, 120]}
-        mixBlur={1.2}
-        mixStrength={1.4}
-        roughness={0.95}
+        mirror={0.65}
+        resolution={512}
+        blur={[260, 90]}
+        mixBlur={0.9}
+        mixStrength={1.8}
+        roughness={0.82}
         depthScale={1.1}
         minDepthThreshold={0.4}
         maxDepthThreshold={1.25}
-        color="#05070e"
-        metalness={0.55}
+        color="#04060c"
+        metalness={0.72}
       />
     </mesh>
   );

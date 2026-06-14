@@ -229,23 +229,34 @@ body::after {
 /* ── HUD command-center primitives ───────────────────────────────────────── */
 :root {
   --color-orbit: oklch(72% 0.17 50); /* orange reactor particles */
-  --hud-line: color-mix(in oklch, var(--color-heal) 26%, var(--color-line));
+  --hud-line: color-mix(in oklch, var(--color-heal) 62%, transparent);
+  --hud-tint: var(--color-heal);
 }
 
+/* transparent holographic glass — see-through, glowing edge (Passengers style) */
 .hud {
   position: relative;
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, var(--color-surface) 52%, transparent),
-    color-mix(in oklch, var(--color-abyss) 55%, transparent)
+    color-mix(in oklch, var(--hud-tint) 11%, transparent),
+    color-mix(in oklch, var(--hud-tint) 3%, transparent)
   );
   border: 1px solid var(--hud-line);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(5px) saturate(150%);
   clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
   padding: 16px 16px 14px;
 }
-.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 45%, var(--color-line)); }
-.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 55%, var(--color-line)); }
+/* top holographic highlight line */
+.hud::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 13px; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--hud-tint) 70%, transparent), transparent);
+  pointer-events: none;
+}
+.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 62%, transparent); --hud-tint: var(--color-orbit); }
+.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 66%, transparent); --hud-tint: var(--color-danger); }
 
 .hud-tab {
   position: absolute;
@@ -308,8 +319,8 @@ body::after {
 /* ── depth + motion ──────────────────────────────────────────────────────── */
 .hud {
   box-shadow:
-    0 22px 50px -26px rgba(0, 0, 0, 0.85),
-    inset 0 1px 0 color-mix(in oklch, var(--color-heal) 12%, transparent);
+    0 0 28px color-mix(in oklch, var(--hud-tint) 20%, transparent),
+    inset 0 0 28px color-mix(in oklch, var(--hud-tint) 7%, transparent);
 }
 
 /* reactor 3D tilt + stacked depth */

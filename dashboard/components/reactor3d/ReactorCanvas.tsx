@@ -281,7 +281,7 @@ function Ring({ radius, tube, color, speed, opacity = 1 }: { radius: number; tub
   return (
     <mesh ref={ref}>
       <torusGeometry args={[radius, tube, 16, 140]} />
-      <meshBasicMaterial color={color} transparent opacity={opacity} toneMapped={false} />
+      <meshBasicMaterial color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
     </mesh>
   );
 }
@@ -310,20 +310,21 @@ function StageNodes({ stages, accentHex }: { stages: ReactorStage[]; accentHex: 
         <Line
           points={[[0, 0, 0], [ring(RING_NODE, activeIndex)[0], ring(RING_NODE, activeIndex)[1], 0]]}
           color={accentHex}
-          lineWidth={2.5}
+          lineWidth={2}
           transparent
-          opacity={0.85}
+          opacity={0.5}
         />
       )}
       {stages.map((st, i) => {
         const p = ring(RING_NODE, i);
         const lp = ring(RING_LABEL, i);
-        const col = st.active ? "#eafcff" : st.lit ? accentHex : "#27384a";
+        const col = st.active ? "#eafcff" : accentHex;
+        const op = st.active ? 1 : st.lit ? 0.85 : 0.28;
         return (
           <group key={i}>
             <mesh position={[p[0], p[1], 0]} scale={st.active ? 2.0 : st.lit ? 1.25 : 0.9}>
               <sphereGeometry args={[0.07, 16, 16]} />
-              <meshBasicMaterial color={col} toneMapped={false} />
+              <meshBasicMaterial color={col} transparent opacity={op} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
             </mesh>
             <Html position={[lp[0], lp[1], 0]} center distanceFactor={6} pointerEvents="none">
               <div className="mono" style={{ fontSize: 10, letterSpacing: "0.12em", whiteSpace: "nowrap", color: st.active ? "var(--color-heal)" : st.lit ? "var(--color-muted)" : "var(--color-faint)", textShadow: st.active ? "0 0 8px var(--color-heal)" : "none" }}>
@@ -340,8 +341,8 @@ function StageNodes({ stages, accentHex }: { stages: ReactorStage[]; accentHex: 
 function CoverageArc({ coverage }: { coverage: number }) {
   return (
     <mesh rotation={[TILT, 0, Math.PI / 2]}>
-      <torusGeometry args={[1.75, 0.035, 12, 120, Math.PI * 2 * Math.max(0.001, coverage)]} />
-      <meshBasicMaterial color={HEX.heal} toneMapped={false} />
+      <torusGeometry args={[1.75, 0.03, 12, 120, Math.PI * 2 * Math.max(0.001, coverage)]} />
+      <meshBasicMaterial color={HEX.heal} transparent opacity={0.7} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
     </mesh>
   );
 }
@@ -408,9 +409,9 @@ function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
       <group rotation={[TILT, 0, 0]}>
         <Core accent={accent} />
         <WireShell color={glow} />
-        <Ring radius={1.9} tube={0.012} color={pal[2]} speed={0.3} opacity={0.7} />
-        <Ring radius={RING_NODE} tube={0.022} color={glow} speed={-0.18} opacity={0.85} />
-        <Ring radius={2.95} tube={0.01} color={HEX.evolve} speed={0.12} opacity={0.5} />
+        <Ring radius={1.9} tube={0.01} color={pal[2]} speed={0.3} opacity={0.4} />
+        <Ring radius={RING_NODE} tube={0.016} color={glow} speed={-0.18} opacity={0.5} />
+        <Ring radius={2.95} tube={0.008} color={HEX.evolve} speed={0.12} opacity={0.28} />
         <Orbit radius={2.15} count={orbitCount} color={HEX.orbit} speed={0.5} />
         <Orbit radius={1.6} count={18} color={HEX.evolve} speed={-0.4} />
         <Sparkles count={90} scale={6} size={3} speed={0.3} color={glow} opacity={0.6} />

@@ -229,7 +229,7 @@ body::after {
 /* ── HUD command-center primitives ───────────────────────────────────────── */
 :root {
   --color-orbit: oklch(72% 0.17 50); /* orange reactor particles */
-  --hud-line: color-mix(in oklch, var(--color-heal) 62%, transparent);
+  --hud-line: color-mix(in oklch, var(--color-heal) 38%, transparent);
   --hud-tint: var(--color-heal);
 }
 
@@ -257,11 +257,11 @@ body::after {
   position: absolute;
   top: 0; left: 13px; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--hud-tint) 70%, transparent), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--hud-tint) 42%, transparent), transparent);
   pointer-events: none;
 }
-.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 62%, transparent); --hud-tint: var(--color-orbit); }
-.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 66%, transparent); --hud-tint: var(--color-danger); }
+.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 42%, transparent); --hud-tint: var(--color-orbit); }
+.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 46%, transparent); --hud-tint: var(--color-danger); }
 
 /* layered/stacked translucent cards behind a panel (depth) */
 .hud-stack { --hud-tint: var(--color-heal); position: relative; }
@@ -281,24 +281,22 @@ body::after {
   font-size: 9.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-abyss);
-  background: var(--color-heal);
+  color: color-mix(in oklch, var(--hud-tint) 70%, white);
+  background: color-mix(in oklch, var(--hud-tint) 12%, transparent);
+  text-shadow: 0 0 8px color-mix(in oklch, var(--hud-tint) 55%, transparent);
+  border-bottom: 1px solid color-mix(in oklch, var(--hud-tint) 30%, transparent);
   padding: 2px 12px 3px;
   clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
-.is-warn > .hud-tab { background: var(--color-orbit); }
-.is-danger > .hud-tab { background: var(--color-danger); }
 
 .hud .b {
   position: absolute;
   width: 11px;
   height: 11px;
-  border: 1.5px solid var(--color-heal);
-  opacity: 0.85;
+  border: 1px solid color-mix(in oklch, var(--hud-tint) 55%, transparent);
+  opacity: 0.55;
   pointer-events: none;
 }
-.is-warn .b { border-color: var(--color-orbit); }
-.is-danger .b { border-color: var(--color-danger); }
 .hud .tl { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
 .hud .tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
 .hud .bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }

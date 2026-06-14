@@ -24,8 +24,8 @@
 ## 必須開発要件の充足
 
 - アプリ実行(必須): **Cloud Run** ✓（API・対象サービス・ダッシュボード）
-- AI技術(必須): **Gemini ＋ ADK（＋ Vertex AI Gen AI Evaluation）** ✓
-- 任意/加点: Elasticsearch（Incident KB）, Firebase Hosting ✓
+- AI技術(必須): **Gemini ＋ ADK** ✓ — `aegis_platform/cloud/` で実装。`AEGIS_DEMO_MODE=false` で**実GeminiがRCA・ADK（LlmAgent）がエージェント駆動**。安全設計＝LLMは既知アクションの選択のみ→リスク階層はpolicy→失敗時runbookフォールバック。イメージは軽量 `cloud` extra（google-genai/google-adk）同梱で、デプロイ時に1フラグで切替可。
+- 任意/加点: Vertex AI Gen AI Evaluation（judge/CIゲート＝継続）, Elasticsearch（Incident KB）, Firebase Hosting
 
 ## デプロイ手順
 

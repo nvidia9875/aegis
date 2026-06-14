@@ -1,5 +1,6 @@
 # Aegis control-plane API — deployable to Cloud Run.
-# Runs in demo mode by default (no GCP deps needed); add `--extra gcp` for cloud mode.
+# Ships with the lightweight `cloud` extra (Gemini + ADK) so cloud mode is one env flip
+# away (AEGIS_DEMO_MODE=false). Demo mode is the default and never touches Google Cloud.
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /app
@@ -9,7 +10,7 @@ COPY pyproject.toml ./
 COPY uv.lock* ./
 COPY src ./src
 
-RUN uv sync --no-dev
+RUN uv sync --no-dev --extra cloud
 
 EXPOSE 8080
 # Cloud Run injects $PORT (default 8080). Shell form so it expands.

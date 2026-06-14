@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # Deploy Aegis to Cloud Run. Prereqs: `gcloud auth login` and a billing-enabled project.
 #
-#   PROJECT_ID=your-project ./infra/deploy.sh
+#   PROJECT_ID=your-project ./infra/deploy.sh                 # deterministic demo mode (default)
+#   PROJECT_ID=your-project AEGIS_DEMO_MODE=false ./infra/deploy.sh   # live Gemini + ADK (Vertex)
 #
+# Cloud mode uses Vertex AI via the Cloud Run service account (no API key needed) — grant it
+# roles/aiplatform.user. Demo mode is deterministic, free, and never calls Gemini.
 set -euo pipefail
 
 : "${PROJECT_ID:?set PROJECT_ID=your-gcp-project}"
 REGION="${REGION:-asia-northeast1}"
+AEGIS_DEMO_MODE="${AEGIS_DEMO_MODE:-true}"
 
-echo "▸ project=$PROJECT_ID region=$REGION"
+echo "▸ project=$PROJECT_ID region=$REGION demo_mode=$AEGIS_DEMO_MODE"
 gcloud config set project "$PROJECT_ID" >/dev/null
 
 echo "▸ enabling APIs…"
@@ -18,13 +22,18 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   aiplatform.googleapis.com >/dev/null
 
-echo "▸ deploying control-plane API (demo mode)…"
+# Runtime config — cloud mode drives Gemini RCA through Vertex AI (ADC, key-less).
+API_ENV="AEGIS_DEMO_MODE=${AEGIS_DEMO_MODE},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
+API_ENV="${API_ENV},GOOGLE_CLOUD_REGION=${REGION},GOOGLE_GENAI_USE_VERTEXAI=true"
+
+echo "▸ deploying control-plane API…"
 gcloud run deploy aegis-api \
   --source backend \
   --region "$REGION" \
   --allow-unauthenticated \
   --port 8080 \
-  --memory 512Mi
+  --memory 512Mi \
+  --set-env-vars "$API_ENV"
 API_URL=$(gcloud run services describe aegis-api --region "$REGION" --format='value(status.url)')
 
 echo "▸ deploying Mission Control dashboard…"

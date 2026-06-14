@@ -17,7 +17,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Heavy Google Cloud / ADK deps live here so the testable core runs without GCP.
+# Lightweight runtime cloud mode — just the mandatory AI deps (Gemini + ADK).
+# Installed in the Cloud Run image so AEGIS_DEMO_MODE=false genuinely uses Gemini/ADK.
+cloud = [
+    "google-genai>=1.0",
+    "google-adk>=1.0",
+]
+# Heavy Google Cloud / eval / data deps live here so the testable core runs without GCP.
 gcp = [
     "google-genai>=1.0",
     "google-adk>=1.0",

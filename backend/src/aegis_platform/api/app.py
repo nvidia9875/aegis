@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from aegis_platform.api import serializers
 from aegis_platform.api.state import DemoSession
+from aegis_platform.cloud import build_diagnoser
 from aegis_platform.common.config import get_settings
 
 app = FastAPI(title="Aegis — Autonomous SRE control plane", version="0.1.0")
@@ -20,7 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_session = DemoSession()
+# demo mode → deterministic runbook diagnoser; cloud mode → ADK/Gemini RCA.
+_session = DemoSession(
+    autonomy=get_settings().autonomy,
+    diagnoser=build_diagnoser(get_settings()),
+)
 
 
 class InjectRequest(BaseModel):
@@ -38,7 +43,13 @@ class ApproveRequest(BaseModel):
 @app.get("/api/health")
 def health() -> dict[str, Any]:
     s = get_settings()
-    return {"status": "ok", "env": s.env, "demo_mode": s.demo_mode, "autonomy": s.autonomy.value}
+    return {
+        "status": "ok",
+        "env": s.env,
+        "demo_mode": s.demo_mode,
+        "autonomy": s.autonomy.value,
+        "diagnoser": type(_session.operator.diagnoser).__name__,
+    }
 
 
 @app.get("/api/state")

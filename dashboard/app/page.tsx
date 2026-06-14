@@ -8,6 +8,8 @@ import { GovernanceModal } from "@/components/GovernanceModal";
 import { HudFrame } from "@/components/HudFrame";
 import { HudRuler } from "@/components/HudRuler";
 import { MttrSpark } from "@/components/MttrSpark";
+import { Waveform } from "@/components/Waveform";
+import { HexReadout } from "@/components/HexReadout";
 import { Reactor } from "@/components/Reactor";
 import { Timeline } from "@/components/Timeline";
 import { fetchLiveNarrative } from "@/lib/api";
@@ -55,7 +57,8 @@ export default function Page() {
   const alert = cb && !state.finished && cb.severity === "critical";
 
   return (
-    <main style={{ maxWidth: 1620, margin: "0 auto", padding: "16px 22px 40px" }}>
+    <main style={{ maxWidth: 1620, margin: "0 auto", padding: "16px 22px 40px", position: "relative" }}>
+      <div className="scanline" />
       <HudRuler />
 
       {/* ── command bar ─────────────────────────────────────────── */}
@@ -96,7 +99,10 @@ export default function Page() {
         {/* left column */}
         <div style={{ display: "grid", gap: 14 }}>
           <HudFrame label="Live incident log">
-            <div style={{ height: 360 }}><Timeline lines={state.log} /></div>
+            <div style={{ height: 304 }}><Timeline lines={state.log} /></div>
+          </HudFrame>
+          <HudFrame label="Telemetry // rx">
+            <Waveform />
           </HudFrame>
           <HudFrame label="MTTR signal">
             <MttrSpark points={state.mttr} />
@@ -122,15 +128,19 @@ export default function Page() {
                   ✔ all incidents resolved
                 </div>
               )}
-              <Reactor
-                activeStage={state.activeStage}
-                litStages={state.litStages}
-                coverage={p.coverage}
-                antibodies={state.antibodies.length}
-                services={SERVICES.map((s) => ({ id: s.id, name: s.name }))}
-                health={state.health}
-                currentBeat={cb}
-              />
+              <div className="reactor-stage">
+                <div className="reactor-tilt">
+                  <Reactor
+                    activeStage={state.activeStage}
+                    litStages={state.litStages}
+                    coverage={p.coverage}
+                    antibodies={state.antibodies.length}
+                    services={SERVICES.map((s) => ({ id: s.id, name: s.name }))}
+                    health={state.health}
+                    currentBeat={cb}
+                  />
+                </div>
+              </div>
             </div>
           </HudFrame>
 
@@ -168,6 +178,19 @@ export default function Page() {
             </div>
           </HudFrame>
         </div>
+      </div>
+
+      {/* ── bottom diagnostics strip ─────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginTop: 14 }}>
+        <HudFrame label="Diagnostics // F1">
+          <HexReadout />
+        </HudFrame>
+        <HudFrame label="Signal // analysis">
+          <div style={{ display: "grid", gap: 12 }}>
+            <Waveform color="var(--color-evolve)" bars={48} />
+            <Waveform color="var(--color-orbit)" bars={48} />
+          </div>
+        </HudFrame>
       </div>
 
       <GovernanceModal beat={state.pendingGate} onApprove={p.approve} onDeny={p.deny} />

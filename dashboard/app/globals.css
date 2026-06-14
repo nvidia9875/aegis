@@ -304,3 +304,57 @@ body::after {
   background: var(--color-line);
 }
 .ruler .t.major::before { height: 13px; background: color-mix(in oklch, var(--color-heal) 50%, transparent); }
+
+/* ── depth + motion ──────────────────────────────────────────────────────── */
+.hud {
+  box-shadow:
+    0 22px 50px -26px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 color-mix(in oklch, var(--color-heal) 12%, transparent);
+}
+
+/* reactor 3D tilt + stacked depth */
+.reactor-stage {
+  perspective: 1500px;
+  perspective-origin: 50% 38%;
+}
+.reactor-tilt {
+  transform: rotateX(20deg);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* continuous SVG rotation (transform-origin set inline per element) */
+@keyframes spin360 { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes spin360r { from { transform: rotate(0); } to { transform: rotate(-360deg); } }
+.svg-spin { transform-box: view-box; animation: spin360 linear infinite; }
+.svg-spin-rev { transform-box: view-box; animation: spin360r linear infinite; }
+
+@keyframes emit { 0% { transform: scale(0.45); opacity: 0.55; } 100% { transform: scale(1.9); opacity: 0; } }
+.emit { transform-box: view-box; animation: emit 2.8s ease-out infinite; }
+
+/* always-on telemetry waveform */
+@keyframes wave { 0%, 100% { transform: scaleY(0.22); } 50% { transform: scaleY(1); } }
+.wave-bar { transform-origin: bottom; animation: wave 1.2s ease-in-out infinite; }
+
+/* scrolling diagnostics readout */
+@keyframes scrollup { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+.scroll-col { animation: scrollup 14s linear infinite; }
+
+/* slow ambient scanline */
+@keyframes scan { from { transform: translateY(-100%); } to { transform: translateY(100vh); } }
+.scanline {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 140px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--color-heal) 5%, transparent), transparent);
+  animation: scan 7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-spin, .svg-spin-rev, .emit, .wave-bar, .scroll-col, .scanline { animation: none; }
+  .reactor-tilt { transform: rotateX(16deg); }
+}

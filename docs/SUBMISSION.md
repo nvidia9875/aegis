@@ -17,9 +17,14 @@
 
 ## Google Form（正式エントリーの3点）
 
-1. GitHub（公開リポジトリ）: <this repo URL>
-2. デプロイURL（動作確認可能）: Cloud Run の Mission Control URL（`infra/deploy.sh` 実行後に出力。Demo mode常時稼働）
+1. GitHub（公開リポジトリ）: https://github.com/nvidia9875/aegis
+2. デプロイURL（動作確認可能）: **https://aegis-dashboard-110342587472.us-central1.run.app**（Mission Control）
+   - control-plane API: https://aegis-api-110342587472.us-central1.run.app （`/api/health` で稼働モード確認可）
+   - 現在 **cloud-mode で稼働**（`/api/health` → `diagnoser: AdkDiagnoser`＝実Gemini＋ADK）。`/api/demo/run` で実RCAが走る（root_causeがLLM生成の自然文・MTTRに実Vertex呼び出しの遅延が出る）。
 3. ProtoPedia 作品URL: <after registering>
+
+> プロジェクト: `devops-hackathon-499407` / region: `us-central1`。再デプロイは `PROJECT_ID=devops-hackathon-499407 REGION=us-central1 AEGIS_DEMO_MODE=false ./infra/deploy.sh`。
+> 公開URLを“絶対事故らせない”運用にしたい場合は `AEGIS_DEMO_MODE=true` で再デプロイすれば決定論デモに切替（実Gemini/ADKは動画で提示）。
 
 ## 必須開発要件の充足
 

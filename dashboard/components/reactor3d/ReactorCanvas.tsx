@@ -145,7 +145,8 @@ void main(){
   col += vec3(1.0) * pow(max(plasma-0.82,0.0),2.0) * 1.3; // white-hot filaments
   float fres = pow(1.0 - max(dot(normalize(vNormalW), normalize(vView)),0.0), 2.4);
   col = mix(col, col + uC2*0.9, fres);                    // luminous rim (mid hue)
-  gl_FragColor = vec4(col*1.28, 1.0);
+  float alpha = clamp(0.46 + plasma*0.55 + fres*0.4, 0.0, 1.0); // translucent glass core
+  gl_FragColor = vec4(col*1.18, alpha);
 }`;
 
 function PlasmaCore({ palette }: { palette: string[] }) {
@@ -172,7 +173,7 @@ function PlasmaCore({ palette }: { palette: string[] }) {
   return (
     <mesh>
       <sphereGeometry args={[0.6, 96, 96]} />
-      <shaderMaterial ref={mat} args={[{ uniforms, vertexShader: CORE_VERT, fragmentShader: CORE_FRAG }]} />
+      <shaderMaterial ref={mat} args={[{ uniforms, vertexShader: CORE_VERT, fragmentShader: CORE_FRAG, transparent: true, depthWrite: false }]} />
     </mesh>
   );
 }
@@ -385,16 +386,16 @@ function WireShell({ color }: { color: string }) {
     <group>
       <mesh ref={a}>
         <icosahedronGeometry args={[1.5, 2]} />
-        <meshBasicMaterial color={color} wireframe transparent opacity={0.14} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial color={color} wireframe transparent opacity={0.09} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </mesh>
       <mesh ref={b}>
         <icosahedronGeometry args={[1.3, 1]} />
-        <meshBasicMaterial color={color} wireframe transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial color={color} wireframe transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </mesh>
       {/* soft volumetric glow halo */}
       <mesh>
         <sphereGeometry args={[2.3, 32, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} toneMapped={false} />
+        <meshBasicMaterial color={color} transparent opacity={0.045} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -409,9 +410,9 @@ function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
       <group rotation={[TILT, 0, 0]}>
         <Core accent={accent} />
         <WireShell color={glow} />
-        <Ring radius={1.9} tube={0.01} color={pal[2]} speed={0.3} opacity={0.4} />
-        <Ring radius={RING_NODE} tube={0.016} color={glow} speed={-0.18} opacity={0.5} />
-        <Ring radius={2.95} tube={0.008} color={HEX.evolve} speed={0.12} opacity={0.28} />
+        <Ring radius={1.9} tube={0.009} color={pal[2]} speed={0.3} opacity={0.26} />
+        <Ring radius={RING_NODE} tube={0.014} color={glow} speed={-0.18} opacity={0.34} />
+        <Ring radius={2.95} tube={0.007} color={HEX.evolve} speed={0.12} opacity={0.18} />
         <Orbit radius={2.15} count={orbitCount} color={HEX.orbit} speed={0.5} />
         <Orbit radius={1.6} count={18} color={HEX.evolve} speed={-0.4} />
         <Sparkles count={90} scale={6} size={3} speed={0.3} color={glow} opacity={0.6} />

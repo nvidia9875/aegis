@@ -229,7 +229,7 @@ body::after {
 /* ── HUD command-center primitives ───────────────────────────────────────── */
 :root {
   --color-orbit: oklch(72% 0.17 50); /* orange reactor particles */
-  --hud-line: color-mix(in oklch, var(--color-heal) 38%, transparent);
+  --hud-line: color-mix(in oklch, var(--color-heal) 26%, transparent);
   --hud-tint: var(--color-heal);
 }
 
@@ -238,11 +238,11 @@ body::after {
   position: relative;
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, var(--hud-tint) 7%, transparent),
-    color-mix(in oklch, var(--hud-tint) 2%, transparent)
+    color-mix(in oklch, var(--hud-tint) 4%, transparent),
+    color-mix(in oklch, var(--hud-tint) 1%, transparent)
   );
   border: 1px solid var(--hud-line);
-  backdrop-filter: blur(4px) saturate(150%);
+  backdrop-filter: blur(7px) saturate(155%);
   clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
   padding: 16px 16px 14px;
   /* outer glow + chromatic edge fringe (follows the clipped silhouette) */
@@ -250,6 +250,15 @@ body::after {
     drop-shadow(0 0 12px color-mix(in oklch, var(--hud-tint) 38%, transparent))
     drop-shadow(1.5px 0 1px rgba(255, 70, 95, 0.35))
     drop-shadow(-1.5px 0 1px rgba(70, 210, 255, 0.35));
+}
+/* diagonal glass sheen (polished-pane reflection) */
+.hud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, transparent 38%);
+  clip-path: inherit;
+  pointer-events: none;
 }
 /* top holographic highlight line */
 .hud::after {
@@ -260,8 +269,8 @@ body::after {
   background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--hud-tint) 42%, transparent), transparent);
   pointer-events: none;
 }
-.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 42%, transparent); --hud-tint: var(--color-orbit); }
-.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 46%, transparent); --hud-tint: var(--color-danger); }
+.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 30%, transparent); --hud-tint: var(--color-orbit); }
+.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 34%, transparent); --hud-tint: var(--color-danger); }
 
 /* layered/stacked translucent cards behind a panel (depth) */
 .hud-stack { --hud-tint: var(--color-heal); position: relative; }

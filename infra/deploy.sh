@@ -22,9 +22,13 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   aiplatform.googleapis.com >/dev/null
 
+# Vertex location for Gemini/ADK (GOOGLE_CLOUD_LOCATION is what ADK reads).
+VERTEX_LOCATION="${VERTEX_LOCATION:-$REGION}"
+
 # Runtime config — cloud mode drives Gemini RCA through Vertex AI (ADC, key-less).
 API_ENV="AEGIS_DEMO_MODE=${AEGIS_DEMO_MODE},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
-API_ENV="${API_ENV},GOOGLE_CLOUD_REGION=${REGION},GOOGLE_GENAI_USE_VERTEXAI=true"
+API_ENV="${API_ENV},GOOGLE_CLOUD_REGION=${VERTEX_LOCATION},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION}"
+API_ENV="${API_ENV},GOOGLE_GENAI_USE_VERTEXAI=true"
 
 echo "▸ deploying control-plane API…"
 gcloud run deploy aegis-api \
@@ -32,19 +36,32 @@ gcloud run deploy aegis-api \
   --region "$REGION" \
   --allow-unauthenticated \
   --port 8080 \
-  --memory 512Mi \
+  --memory 1Gi \
   --set-env-vars "$API_ENV"
 API_URL=$(gcloud run services describe aegis-api --region "$REGION" --format='value(status.url)')
 
+# Cloud mode: grant the Cloud Run runtime service account access to Vertex AI.
+if [ "$AEGIS_DEMO_MODE" = "false" ]; then
+  SA=$(gcloud run services describe aegis-api --region "$REGION" \
+    --format='value(spec.template.spec.serviceAccountName)')
+  if [ -z "$SA" ]; then
+    PNUM=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+    SA="${PNUM}-compute@developer.gserviceaccount.com"
+  fi
+  echo "▸ granting roles/aiplatform.user to $SA …"
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:${SA}" --role="roles/aiplatform.user" >/dev/null
+fi
+
 echo "▸ deploying Mission Control dashboard…"
-# Dashboard works fully in self-contained Demo mode. To enable Live mode against the
-# API, rebuild with: --set-build-env-vars NEXT_PUBLIC_AEGIS_API="$API_URL"
+# Bake the API URL so the dashboard's Live mode can hit the control plane.
 gcloud run deploy aegis-dashboard \
   --source dashboard \
   --region "$REGION" \
   --allow-unauthenticated \
   --port 8080 \
-  --memory 512Mi
+  --memory 512Mi \
+  --set-build-env-vars "NEXT_PUBLIC_AEGIS_API=${API_URL}"
 
 DASH_URL=$(gcloud run services describe aegis-dashboard --region "$REGION" --format='value(status.url)')
 

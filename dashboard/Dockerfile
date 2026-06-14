@@ -1,9 +1,12 @@
 # Aegis Mission Control — Next.js (standalone) for Cloud Run.
+# pnpm is pinned via package.json "packageManager" (corepack) so the container build
+# matches local and doesn't pull a pnpm that needs a newer Node than this image.
 FROM node:20-alpine AS build
 WORKDIR /app
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN corepack install && (pnpm install --frozen-lockfile || pnpm install)
 COPY . ./
 # Bake the control-plane API base in at build time for Live mode (optional).
 ARG NEXT_PUBLIC_AEGIS_API=""

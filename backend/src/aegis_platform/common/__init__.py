@@ -1,0 +1,45 @@
+"""Shared config + domain schemas."""
+
+from aegis_platform.common.config import Autonomy, Settings, get_settings
+from aegis_platform.common.schemas import (
+    HIGHER_IS_BETTER,
+    ActionType,
+    Anomaly,
+    Antibody,
+    AuditEntry,
+    ChangeKind,
+    Deploy,
+    Incident,
+    IncidentClass,
+    IncidentStatus,
+    MetricKind,
+    MetricSample,
+    RemediationAction,
+    RiskTier,
+    RootCause,
+    ServiceRef,
+    Severity,
+)
+
+__all__ = [
+    "HIGHER_IS_BETTER",
+    "ActionType",
+    "Anomaly",
+    "Antibody",
+    "AuditEntry",
+    "Autonomy",
+    "ChangeKind",
+    "Deploy",
+    "Incident",
+    "IncidentClass",
+    "IncidentStatus",
+    "MetricKind",
+    "MetricSample",
+    "RemediationAction",
+    "RiskTier",
+    "RootCause",
+    "ServiceRef",
+    "Settings",
+    "Severity",
+    "get_settings",
+]

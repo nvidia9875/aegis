@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Aegis Mission Control — dark-luxury control room, disciplined neon (oklch)
+   ───────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-void: oklch(13% 0.018 275);
+  --color-abyss: oklch(10% 0.02 275);
+  --color-surface: oklch(18% 0.022 275);
+  --color-line: oklch(30% 0.02 275);
+  --color-ink: oklch(96% 0.01 275);
+  --color-muted: oklch(72% 0.02 275);
+  --color-faint: oklch(55% 0.02 275);
+
+  --color-heal: oklch(82% 0.13 195);     /* cyan — remediation/healthy energy */
+  --color-evolve: oklch(72% 0.17 295);   /* violet — reasoning / immunize */
+  --color-warn: oklch(83% 0.15 80);      /* amber — warning */
+  --color-danger: oklch(68% 0.23 18);    /* red — critical / irreversible */
+  --color-healthy: oklch(82% 0.16 155);  /* green — recovered */
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+:root {
+  --glass: color-mix(in oklch, var(--color-surface) 60%, transparent);
+  --glass-line: color-mix(in oklch, var(--color-ink) 10%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-abyss);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Atmospheric backdrop: layered radial meshes + vignette */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 50% at 18% 0%, color-mix(in oklch, var(--color-evolve) 16%, transparent), transparent 70%),
+    radial-gradient(55% 45% at 100% 18%, color-mix(in oklch, var(--color-heal) 13%, transparent), transparent 70%),
+    radial-gradient(80% 70% at 50% 120%, color-mix(in oklch, var(--color-evolve) 10%, transparent), transparent 70%),
+    var(--color-abyss);
+}
+
+/* Fine grain overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(14px) saturate(120%);
+  border-radius: 18px;
+}
+
+.panel-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* hairline divider */
+.hr {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-line), transparent);
+}
+
+/* scrollbars */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--color-ink) 14%, transparent);
+  border-radius: 99px;
+}
+
+/* flowing energy on the active pipeline edge */
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+.edge-flow {
+  stroke-dasharray: 2 8;
+  animation: dashflow 0.7s linear infinite;
+}
+
+@keyframes pulsering {
+  0% { transform: scale(1); opacity: 0.55; }
+  70% { transform: scale(2.1); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .edge-flow { animation: none; stroke-dasharray: none; }
+}
+
+/* ── controls ───────────────────────────────────────────────────────────── */
+.btn-primary {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 11px;
+  color: var(--color-abyss);
+  background: var(--color-heal);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 0 22px color-mix(in oklch, var(--color-heal) 45%, transparent);
+  transition: transform 0.15s var(--ease, ease), filter 0.15s ease;
+}
+.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 11px;
+  color: var(--color-muted);
+  background: transparent;
+  border: 1px solid var(--color-line);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.btn-ghost:hover { color: var(--color-ink); border-color: var(--color-muted); }
+
+.pill {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.pill .dot { width: 6px; height: 6px; border-radius: 99px; }
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.seg button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--color-faint);
+  border: none;
+  cursor: pointer;
+}
+.seg button[data-on="true"] { background: color-mix(in oklch, var(--color-heal) 22%, transparent); color: var(--color-ink); }
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--color-ink);
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}

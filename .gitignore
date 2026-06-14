@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+dist/
+build/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+dashboard/.next/
+dashboard/out/
+.turbo/
+*.tsbuildinfo
+
+# Env & secrets (NEVER commit)
+.env
+.env.*
+!.env.example
+*-key.json
+*-sa.json
+service-account*.json
+gcp-credentials*.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Local artifacts
+.playwright-mcp/
+/tmp/
+*.local

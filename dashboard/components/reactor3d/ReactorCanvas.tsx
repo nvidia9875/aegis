@@ -1,8 +1,8 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, Line, MeshReflectorMaterial, Sparkles, Stars } from "@react-three/drei";
-import { Bloom, ChromaticAberration, DepthOfField, EffectComposer, Vignette } from "@react-three/postprocessing";
+import { Html, Line, MeshReflectorMaterial, MeshTransmissionMaterial, Sparkles, Stars } from "@react-three/drei";
+import { Bloom, BrightnessContrast, ChromaticAberration, DepthOfField, EffectComposer, HueSaturation, Vignette } from "@react-three/postprocessing";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -154,13 +154,34 @@ function PlasmaCore({ color }: { color: string }) {
   );
 }
 
-function Vortex({ color }: { color: string }) {
-  const ref = useRef<THREE.Points>(null);
+// ── curl-flow particle corona (GPU shader points) ────────────────────────────
+const CORONA_VERT = /* glsl */ `${SNOISE}
+uniform float uTime; uniform float uSize; varying float vA;
+void main(){
+  vec3 b = position; float t = uTime*0.25;
+  vec3 off = vec3(snoise(b*1.6+vec3(t,0.0,0.0)), snoise(b*1.6+vec3(0.0,t,0.0)), snoise(b*1.6+vec3(0.0,0.0,t)))*0.18;
+  float ang = t*0.7 + length(b)*1.4;
+  vec3 p = b + off; float c = cos(ang); float s = sin(ang);
+  p.xz = mat2(c,-s,s,c)*p.xz;
+  vA = 0.35 + 0.65*smoothstep(0.6,0.98,length(b));
+  vec4 mv = modelViewMatrix*vec4(p,1.0);
+  gl_PointSize = clamp(uSize/(-mv.z), 1.0, 16.0);
+  gl_Position = projectionMatrix*mv;
+}`;
+const CORONA_FRAG = /* glsl */ `
+precision mediump float; uniform vec3 uColor; varying float vA;
+void main(){
+  vec2 d = gl_PointCoord-0.5; float a = smoothstep(0.5,0.0,length(d));
+  gl_FragColor = vec4(uColor, a*vA);
+}`;
+
+function CurlCorona({ color }: { color: string }) {
+  const mat = useRef<THREE.ShaderMaterial>(null);
   const geo = useMemo(() => {
     const n = 900;
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      const r = 0.62 + Math.random() * 0.34;
+      const r = 0.62 + Math.random() * 0.36;
       const th = Math.random() * Math.PI * 2;
       const ph = Math.acos(2 * Math.random() - 1);
       pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
@@ -171,24 +192,50 @@ function Vortex({ color }: { color: string }) {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     return g;
   }, []);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uSize: { value: 46 }, uColor: { value: new THREE.Color(color) } }), []);
   useFrame((s) => {
-    if (ref.current) {
-      ref.current.rotation.y = s.clock.elapsedTime * 0.45;
-      ref.current.rotation.x = Math.sin(s.clock.elapsedTime * 0.3) * 0.35;
+    if (mat.current) {
+      mat.current.uniforms.uTime.value = s.clock.elapsedTime;
+      (mat.current.uniforms.uColor.value as THREE.Color).set(color);
     }
   });
   return (
-    <points ref={ref} geometry={geo}>
-      <pointsMaterial size={0.022} color={color} transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+    <points geometry={geo}>
+      <shaderMaterial ref={mat} args={[{ uniforms, vertexShader: CORONA_VERT, fragmentShader: CORONA_FRAG, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }]} />
     </points>
   );
 }
 
-function Core({ color }: { color: string }) {
+function GlassShell({ color }: { color: string }) {
+  return (
+    <mesh>
+      <sphereGeometry args={[0.76, 64, 64]} />
+      <MeshTransmissionMaterial
+        samples={4}
+        resolution={256}
+        thickness={0.5}
+        roughness={0.06}
+        ior={1.25}
+        chromaticAberration={0.35}
+        distortion={0.25}
+        distortionScale={0.3}
+        temporalDistortion={0.1}
+        transmission={1}
+        backside={false}
+        color="#ffffff"
+        attenuationColor={color}
+        attenuationDistance={1.8}
+      />
+    </mesh>
+  );
+}
+
+function Core({ color, glass = true }: { color: string; glass?: boolean }) {
   return (
     <group>
       <PlasmaCore color={color} />
-      <Vortex color={color} />
+      {glass && <GlassShell color={color} />}
+      <CurlCorona color={color} />
       <mesh>
         <sphereGeometry args={[0.12, 16, 16]} />
         <meshBasicMaterial color="#ffffff" toneMapped={false} />
@@ -310,7 +357,7 @@ function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
         <Orbit radius={1.6} count={18} color={HEX.evolve} speed={-0.4} />
         <Sparkles count={90} scale={6} size={3} speed={0.3} color={color} opacity={0.6} />
         <group position={[0, 0, -2.6]} scale={0.6}>
-          <Core color={HEX.evolve} />
+          <Core color={HEX.evolve} glass={false} />
           <Ring radius={2.2} tube={0.016} color={HEX.evolve} speed={0.22} opacity={0.5} />
           <Orbit radius={1.9} count={20} color={HEX.orbit} speed={0.4} />
         </group>
@@ -458,6 +505,8 @@ export default function ReactorCanvas(props: ReactorProps) {
         <Bloom intensity={1.9} luminanceThreshold={0.12} luminanceSmoothing={0.3} mipmapBlur radius={0.85} />
         <DepthOfField focusDistance={0.012} focalLength={0.025} bokehScale={2.2} height={460} />
         <ChromaticAberration offset={caOffset} radialModulation={false} modulationOffset={0} />
+        <HueSaturation saturation={0.14} />
+        <BrightnessContrast brightness={0.01} contrast={0.14} />
         <Vignette eskil={false} offset={0.2} darkness={0.98} />
       </EffectComposer>
     </Canvas>

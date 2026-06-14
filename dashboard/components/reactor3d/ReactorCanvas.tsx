@@ -372,6 +372,33 @@ function Burst({ trigger, color }: { trigger: number; color: string }) {
   );
 }
 
+function WireShell({ color }: { color: string }) {
+  const a = useRef<THREE.Mesh>(null);
+  const b = useRef<THREE.Mesh>(null);
+  useFrame((s) => {
+    const t = s.clock.elapsedTime;
+    if (a.current) a.current.rotation.set(t * 0.06, t * 0.1, 0);
+    if (b.current) b.current.rotation.set(-t * 0.08, t * 0.05, t * 0.03);
+  });
+  return (
+    <group>
+      <mesh ref={a}>
+        <icosahedronGeometry args={[1.5, 2]} />
+        <meshBasicMaterial color={color} wireframe transparent opacity={0.14} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <mesh ref={b}>
+        <icosahedronGeometry args={[1.3, 1]} />
+        <meshBasicMaterial color={color} wireframe transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
+      {/* soft volumetric glow halo */}
+      <mesh>
+        <sphereGeometry args={[2.3, 32, 32]} />
+        <meshBasicMaterial color={color} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.BackSide} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
 function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
   const pal = PALETTES[accent];
   const glow = pal[1];
@@ -380,6 +407,7 @@ function Reactor({ coverage, antibodies, accent, stages }: ReactorProps) {
     <group>
       <group rotation={[TILT, 0, 0]}>
         <Core accent={accent} />
+        <WireShell color={glow} />
         <Ring radius={1.9} tube={0.012} color={pal[2]} speed={0.3} opacity={0.7} />
         <Ring radius={RING_NODE} tube={0.022} color={glow} speed={-0.18} opacity={0.85} />
         <Ring radius={2.95} tube={0.01} color={HEX.evolve} speed={0.12} opacity={0.5} />
@@ -436,10 +464,14 @@ function CameraRig() {
 function Panel({ title, children, position, rotY, accent = "heal", width = 260 }: { title: string; children: React.ReactNode; position: [number, number, number]; rotY: number; accent?: "heal" | "danger" | "healthy"; width?: number }) {
   return (
     <Html transform position={position} rotation={[0, rotY, 0]} distanceFactor={3.6} pointerEvents="none">
-      <div className={`hud ${accent === "danger" ? "is-danger" : ""}`} style={{ width, padding: "14px 16px" }}>
-        <span className="b tl" /><span className="b tr" /><span className="b bl" /><span className="b br" />
-        <span className="hud-tab">{title}</span>
-        <div style={{ marginTop: 12 }}>{children}</div>
+      <div className={`hud-stack ${accent === "danger" ? "is-danger" : ""}`} style={{ width }}>
+        <div className="hud-ghost" style={{ position: "absolute", inset: 0, transform: "translate(17px, 19px)" }} />
+        <div className="hud-ghost" style={{ position: "absolute", inset: 0, transform: "translate(9px, 10px)" }} />
+        <div className={`hud ${accent === "danger" ? "is-danger" : ""}`} style={{ position: "relative", width: "100%", padding: "14px 16px" }}>
+          <span className="b tl" /><span className="b tr" /><span className="b bl" /><span className="b br" />
+          <span className="hud-tab">{title}</span>
+          <div style={{ marginTop: 12 }}>{children}</div>
+        </div>
       </div>
     </Html>
   );
@@ -515,6 +547,7 @@ export default function ReactorCanvas(props: ReactorProps) {
       gl={{ antialias: false, alpha: true, powerPreference: "high-performance", stencil: false }}
     >
       <ambientLight intensity={0.25} />
+      <fogExp2 attach="fog" args={["#05060d", 0.035]} />
       <Stars radius={90} depth={50} count={1400} factor={3} saturation={0} fade speed={0.5} />
       <CameraRig />
       <Floor />

@@ -53,7 +53,10 @@ body::before {
   background:
     radial-gradient(60% 50% at 18% 0%, color-mix(in oklch, var(--color-evolve) 16%, transparent), transparent 70%),
     radial-gradient(55% 45% at 100% 18%, color-mix(in oklch, var(--color-heal) 13%, transparent), transparent 70%),
-    radial-gradient(80% 70% at 50% 120%, color-mix(in oklch, var(--color-evolve) 10%, transparent), transparent 70%),
+    radial-gradient(38% 38% at 50% 46%, color-mix(in oklch, var(--color-heal) 14%, transparent), transparent 70%),
+    radial-gradient(80% 70% at 50% 120%, color-mix(in oklch, var(--color-orbit) 9%, transparent), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 43px, color-mix(in oklch, var(--color-ink) 4%, transparent) 43px 44px),
+    repeating-linear-gradient(90deg, transparent 0 43px, color-mix(in oklch, var(--color-ink) 4%, transparent) 43px 44px),
     var(--color-abyss);
 }
 
@@ -222,3 +225,82 @@ body::after {
   text-transform: uppercase;
   color: var(--color-faint);
 }
+
+/* ── HUD command-center primitives ───────────────────────────────────────── */
+:root {
+  --color-orbit: oklch(72% 0.17 50); /* orange reactor particles */
+  --hud-line: color-mix(in oklch, var(--color-heal) 26%, var(--color-line));
+}
+
+.hud {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--color-surface) 52%, transparent),
+    color-mix(in oklch, var(--color-abyss) 55%, transparent)
+  );
+  border: 1px solid var(--hud-line);
+  backdrop-filter: blur(8px);
+  clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+  padding: 16px 16px 14px;
+}
+.hud.is-warn { --hud-line: color-mix(in oklch, var(--color-orbit) 45%, var(--color-line)); }
+.hud.is-danger { --hud-line: color-mix(in oklch, var(--color-danger) 55%, var(--color-line)); }
+
+.hud-tab {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-abyss);
+  background: var(--color-heal);
+  padding: 2px 12px 3px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.is-warn > .hud-tab { background: var(--color-orbit); }
+.is-danger > .hud-tab { background: var(--color-danger); }
+
+.hud .b {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--color-heal);
+  opacity: 0.85;
+  pointer-events: none;
+}
+.is-warn .b { border-color: var(--color-orbit); }
+.is-danger .b { border-color: var(--color-danger); }
+.hud .tl { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+.hud .tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
+.hud .bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }
+.hud .br { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+
+/* top timeline ruler */
+.ruler {
+  display: flex;
+  align-items: flex-end;
+  height: 20px;
+  border-bottom: 1px solid var(--color-line);
+  font-family: var(--font-mono);
+  margin-bottom: 14px;
+}
+.ruler .t {
+  flex: 1;
+  position: relative;
+  font-size: 8.5px;
+  color: var(--color-faint);
+  padding-left: 4px;
+}
+.ruler .t::before {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 1px;
+  height: 8px;
+  background: var(--color-line);
+}
+.ruler .t.major::before { height: 13px; background: color-mix(in oklch, var(--color-heal) 50%, transparent); }

@@ -51,4 +51,4 @@ PROJECT_ID=your-gcp-project ./infra/deploy.sh
 - [ ] アーキ図を画像化（`docs/ARCHITECTURE.md` ベース）
 - [ ] ProtoPedia 登録（タグ `findy_hackathon`）
 - [ ] Google Form 提出（GitHub / デプロイURL / ProtoPedia URL）
-- [ ] backend: `uv run pytest` green（68 tests）/ 証明ベンチ `uv run python -m aegis_platform.bench` → VERDICT: PASS / dashboard: `pnpm build` green
+- [ ] backend: `uv run pytest` green（87 passed / 1 skipped・カバレッジ92%）/ 証明ベンチ `uv run python -m aegis_platform.bench` → VERDICT: PASS（検知率100%・分類100%・原因rev特定100%・誤操作率0%・自律解決80%・抗体5）/ dashboard: `pnpm build` green

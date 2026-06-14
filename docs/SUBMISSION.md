@@ -13,7 +13,7 @@
 - **ストーリー**:
   - ① 課題と背景: オンコール／インシデント対応はDevOpsの最大の痛み。とりわけAIサービスは、プロンプト/モデル変更で“静かに”品質が劣化し、コストが爆発し、ハルシネーションやPII漏えいが起きる新種の障害が増えている。
   - ② 想定ユーザー: AIサービス／エージェントを本番運用するチーム・SRE・プラットフォームエンジニア。
-  - ③ プロダクトの特徴: 自律自己修復ループ（必然性）／Governanceゲート（不可逆操作は人間承認＝本番に出せる自律）／Fleet Immunity（横断インシデント抗体＝複利の堀）／Runbook自己改善（MTTR逓減）／Mission Control（ライブNOC）。
+  - ③ プロダクトの特徴: 自律自己修復ループ（必然性）／Governanceゲート（不可逆操作は人間承認＝本番に出せる自律）／Fleet Immunity（横断インシデント抗体＝複利の堀）／Runbook自己改善（MTTR逓減）／Mission Control（ライブNOC）。**主張は内蔵ベンチで実証**：障害注入の正解と突合し、検知率100%・分類100%・原因rev特定100%・誤操作率0%（`uv run python -m aegis_platform.bench`）。
 
 ## Google Form（正式エントリーの3点）
 
@@ -46,4 +46,4 @@ PROJECT_ID=your-gcp-project ./infra/deploy.sh
 - [ ] アーキ図を画像化（`docs/ARCHITECTURE.md` ベース）
 - [ ] ProtoPedia 登録（タグ `findy_hackathon`）
 - [ ] Google Form 提出（GitHub / デプロイURL / ProtoPedia URL）
-- [ ] backend: `uv run pytest` green / dashboard: `pnpm build` green
+- [ ] backend: `uv run pytest` green（68 tests）/ 証明ベンチ `uv run python -m aegis_platform.bench` → VERDICT: PASS / dashboard: `pnpm build` green

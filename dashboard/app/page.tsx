@@ -10,12 +10,24 @@ import { HudRuler } from "@/components/HudRuler";
 import { MttrSpark } from "@/components/MttrSpark";
 import { Waveform } from "@/components/Waveform";
 import { HexReadout } from "@/components/HexReadout";
-import { Reactor } from "@/components/Reactor";
+import dynamic from "next/dynamic";
 import { Timeline } from "@/components/Timeline";
 import { fetchLiveNarrative } from "@/lib/api";
 import { NARRATIVE, SERVICES } from "@/lib/narrative";
 import type { Beat } from "@/lib/types";
+import { STAGES } from "@/lib/types";
 import { usePlayer } from "@/lib/usePlayer";
+
+const ReactorCanvas = dynamic(() => import("@/components/reactor3d/ReactorCanvas"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ height: 460, display: "grid", placeItems: "center" }}>
+      <span className="mono" style={{ color: "var(--color-faint)", fontSize: 11, letterSpacing: "0.2em" }}>
+        INITIALIZING REACTOR…
+      </span>
+    </div>
+  ),
+});
 
 function Stat({ value, label, accent }: { value: string; label: string; accent?: string }) {
   return (
@@ -128,18 +140,14 @@ export default function Page() {
                   ✔ all incidents resolved
                 </div>
               )}
-              <div className="reactor-stage">
-                <div className="reactor-tilt">
-                  <Reactor
-                    activeStage={state.activeStage}
-                    litStages={state.litStages}
-                    coverage={p.coverage}
-                    antibodies={state.antibodies.length}
-                    services={SERVICES.map((s) => ({ id: s.id, name: s.name }))}
-                    health={state.health}
-                    currentBeat={cb}
-                  />
-                </div>
+              <div style={{ height: 460 }}>
+                <ReactorCanvas
+                  activeIndex={state.activeStage ? STAGES.findIndex((s) => s.id === state.activeStage) : -1}
+                  litCount={state.litStages.length}
+                  coverage={p.coverage}
+                  antibodies={state.antibodies.length}
+                  accent={alert ? "danger" : state.finished ? "healthy" : "heal"}
+                />
               </div>
             </div>
           </HudFrame>

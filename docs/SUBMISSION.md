@@ -5,7 +5,7 @@
 - **作品ステータス**: 公開
 - **作品タイトル**: Aegis — AIサービスを自己修復する自律SRE
 - **概要**: AIサービスが落ちた瞬間、Aegisがログ・トレース・直近デプロイ・品質メトリクスを自律で突き合わせて原因を特定し、リバーシブルな修復は自動で、不可逆な操作は人間承認（Governanceゲート）で実行し、そのインシデントを“抗体”として艦隊全体に予防接種する（Fleet Immunity）。人間が起きる前に。
-- **画像**: `aegis-hud-v2.png`（3Dリアクター司令室・全体）, `aegis-hud-02-gate.png`（Governanceゲート）, `aegis-hud-v2-resolved.png`（全解決・全ステージ点灯・免疫60%）（リポジトリ直下／Mission Control の各状態）
+- **画像**: `aegis-3d-idle.png`（WebGLリアクター・待機）, `aegis-3d-active.png`（インシデント対応中・コア赤発光）, `aegis-hud-02-gate.png`（Governanceゲート）（リポジトリ直下／Mission Control の各状態。three.js/R3F製の3Dリアクター）
 - **動画**: YouTube（2分／`docs/DEMO_SCRIPT.md` の台本）— *提出前に録画*
 - **システム構成**: `docs/ARCHITECTURE.md` の図 + 技術補足
 - **開発素材**: Python, uv, FastAPI, pytest / Google ADK, Gemini, Vertex AI Gen AI Evaluation, Cloud Run, Cloud Monitoring/Logging/Trace, Pub/Sub, BigQuery, Firestore / Next.js, TypeScript, framer-motion, Tailwind v4

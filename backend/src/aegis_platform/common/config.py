@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     loop_max_steps: int = Field(default=12, alias="AEGIS_LOOP_MAX_STEPS")
     autonomy: Autonomy = Field(default=Autonomy.GUARDED, alias="AEGIS_AUTONOMY")
 
+    # CORS — comma-separated allowed origins for the dashboard (no wildcard in prod).
+    allowed_origins: str = Field(default="http://localhost:3000", alias="AEGIS_ALLOWED_ORIGINS")
+
     # Stores / integrations (optional; empty → in-memory fallbacks)
     bigquery_dataset: str = Field(default="aegis", alias="BIGQUERY_DATASET")
     elasticsearch_url: str = Field(default="", alias="ELASTICSEARCH_URL")

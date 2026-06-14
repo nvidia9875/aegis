@@ -35,4 +35,11 @@ for SVC in "${SERVICES[@]}"; do
   esac
 done
 
-echo "✅ access mode: $MODE"
+# Cost guard: a PUBLIC URL runs demo mode (deterministic, no Gemini token cost);
+# PRIVATE keeps cloud mode (real Gemini + ADK) since only you can reach it.
+if [ "$MODE" = "public" ]; then DEMO=true; else DEMO=false; fi
+echo "▸ aegis-api → AEGIS_DEMO_MODE=$DEMO"
+gcloud run services update aegis-api --region="$REGION" --project="$PROJECT_ID" \
+  --update-env-vars "AEGIS_DEMO_MODE=${DEMO}" >/dev/null
+
+echo "✅ access mode: $MODE (api demo_mode=$DEMO)"

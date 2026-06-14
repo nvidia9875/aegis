@@ -14,11 +14,12 @@ from aegis_platform.cloud import build_diagnoser
 from aegis_platform.common.config import get_settings
 
 app = FastAPI(title="Aegis — Autonomous SRE control plane", version="0.1.0")
+_origins = [o.strip() for o in get_settings().allowed_origins.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_origins,                 # explicit allowlist, no wildcard
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 
 # demo mode → deterministic runbook diagnoser; cloud mode → ADK/Gemini RCA.
@@ -42,12 +43,10 @@ class ApproveRequest(BaseModel):
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    s = get_settings()
+    # Minimal, non-sensitive operational status (mode is needed to verify cloud vs demo).
     return {
         "status": "ok",
-        "env": s.env,
-        "demo_mode": s.demo_mode,
-        "autonomy": s.autonomy.value,
+        "demo_mode": get_settings().demo_mode,
         "diagnoser": type(_session.operator.diagnoser).__name__,
     }
 

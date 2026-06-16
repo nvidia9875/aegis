@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 940" font-family="'Segoe UI',Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0e16"/>
+      <stop offset="1" stop-color="#070a11"/>
+    </linearGradient>
+    <linearGradient id="op" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#121b29"/>
+      <stop offset="1" stop-color="#0d1420"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#4fd6ff"/>
+    </marker>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#57e0a0"/>
+    </marker>
+    <style>
+      .h{fill:#e8eef6;font-weight:700}
+      .t{fill:#cdd9e6}
+      .m{fill:#8aa0b3}
+      .lbl{fill:#6f8498;font-size:13px;letter-spacing:.06em}
+      .tag{fill:#0a0e16;font-weight:700}
+      .mono{font-family:'SFMono-Regular',Consolas,monospace}
+    </style>
+  </defs>
+
+  <rect width="1600" height="940" fill="url(#bg)"/>
+
+  <!-- title -->
+  <text x="48" y="58" class="h" font-size="34">AEGIS</text>
+  <text x="172" y="58" class="m" font-size="19">— the Autonomous SRE for AI services</text>
+  <text x="49" y="84" class="lbl mono">DETECT · PERCEIVE · RECALL · REASON · ACT · VERIFY · REFLECT · IMMUNIZE</text>
+
+  <!-- AI services (left) -->
+  <rect x="48" y="150" width="252" height="250" rx="14" fill="#101824" stroke="#22303f"/>
+  <text x="72" y="186" class="lbl">GUARDED TARGET</text>
+  <text x="72" y="220" class="h" font-size="20">AI Service(s)</text>
+  <text x="72" y="252" class="t" font-size="16">RAG chat API</text>
+  <text x="72" y="278" class="t" font-size="16">+ OpenTelemetry</text>
+  <text x="72" y="318" class="m" font-size="14">groundedness · cost · latency</text>
+  <text x="72" y="340" class="m" font-size="14">hallucination · PII · errors</text>
+  <text x="72" y="378" class="m mono" font-size="13">Cloud Run revisions</text>
+
+  <!-- operator (center) -->
+  <rect x="360" y="120" width="852" height="438" rx="16" fill="url(#op)" stroke="#2a3b4f"/>
+  <text x="384" y="156" class="h" font-size="19">AEGIS OPERATOR</text>
+  <text x="556" y="156" class="m" font-size="15">autonomous self-heal loop · ADK + Gemini</text>
+
+  <!-- pipeline pills -->
+  <g font-size="13" text-anchor="middle">
+    <!-- 8 pills from x=384 width=86 gap=14 -->
+    <g>
+      <rect x="384" y="180" width="86" height="40" rx="9" fill="#0e1a16" stroke="#2f5d49"/>
+      <text x="427" y="205" class="t">Detect</text>
+    </g>
+    <g>
+      <rect x="484" y="180" width="86" height="40" rx="9" fill="#0e1a16" stroke="#2f5d49"/>
+      <text x="527" y="205" class="t">Perceive</text>
+    </g>
+    <g>
+      <rect x="584" y="180" width="86" height="40" rx="9" fill="#161226" stroke="#473b78"/>
+      <text x="627" y="205" class="t">Recall</text>
+    </g>
+    <g>
+      <rect x="684" y="180" width="86" height="40" rx="9" fill="#101d2b" stroke="#2c5a72"/>
+      <text x="727" y="205" class="t">Reason</text>
+    </g>
+    <g>
+      <rect x="784" y="180" width="86" height="40" rx="9" fill="#231018" stroke="#7a3047"/>
+      <text x="827" y="205" class="t">Act</text>
+    </g>
+    <g>
+      <rect x="884" y="180" width="86" height="40" rx="9" fill="#0e1a16" stroke="#2f5d49"/>
+      <text x="927" y="205" class="t">Verify</text>
+    </g>
+    <g>
+      <rect x="984" y="180" width="86" height="40" rx="9" fill="#101d2b" stroke="#2c5a72"/>
+      <text x="1027" y="205" class="t">Reflect</text>
+    </g>
+    <g>
+      <rect x="1084" y="180" width="100" height="40" rx="9" fill="#161226" stroke="#5b4aa0"/>
+      <text x="1134" y="205" class="t">Immunize</text>
+    </g>
+  </g>
+  <!-- connector under pills -->
+  <line x1="470" y1="200" x2="484" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="570" y1="200" x2="584" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="670" y1="200" x2="684" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="770" y1="200" x2="784" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="870" y1="200" x2="884" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="970" y1="200" x2="984" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+  <line x1="1070" y1="200" x2="1084" y2="200" stroke="#3a4d61" marker-end="url(#arr)"/>
+
+  <!-- capability cards -->
+  <g>
+    <rect x="384" y="248" width="194" height="150" rx="12" fill="#0c1622" stroke="#243240"/>
+    <text x="400" y="282" class="h" font-size="15">Model Service</text>
+    <text x="400" y="312" class="m" font-size="13">complexity router</text>
+    <text x="400" y="332" class="m" font-size="13">Flash/Gemma → Pro</text>
+    <text x="400" y="352" class="m" font-size="13">cost metering · failover</text>
+  </g>
+  <g>
+    <rect x="592" y="248" width="194" height="150" rx="12" fill="#0c1622" stroke="#243240"/>
+    <text x="608" y="282" class="h" font-size="15">Telemetry</text>
+    <text x="608" y="312" class="m" font-size="13">CUSUM / Wald SPRT</text>
+    <text x="608" y="332" class="m" font-size="13">no-peeking detection</text>
+    <text x="608" y="352" class="m" font-size="13">incident classify</text>
+  </g>
+  <g>
+    <rect x="800" y="248" width="194" height="150" rx="12" fill="#160e14" stroke="#5a2a3c"/>
+    <text x="816" y="282" class="h" font-size="15">Governance</text>
+    <text x="816" y="312" class="m" font-size="13">L0/L1 auto</text>
+    <text x="816" y="332" class="m" font-size="13">L2 human approval</text>
+    <text x="816" y="352" class="m" font-size="13">blast-radius · audit log</text>
+  </g>
+  <g>
+    <rect x="1008" y="248" width="194" height="150" rx="12" fill="#120e22" stroke="#3f3470"/>
+    <text x="1024" y="282" class="h" font-size="15">Fleet Immunity</text>
+    <text x="1024" y="312" class="m" font-size="13">antibodies</text>
+    <text x="1024" y="332" class="m" font-size="13">vaccinate the fleet</text>
+    <text x="1024" y="352" class="m" font-size="13">herd response · MTTR≈0</text>
+  </g>
+
+  <text x="384" y="432" class="m mono" font-size="13">cloud-mode: real Gemini RCA + ADK + real Cloud Run rollback  ·  default: deterministic demo</text>
+  <text x="384" y="454" class="m mono" font-size="13">LLM only picks among known actions → policy sets the risk tier → failure falls back to runbook</text>
+
+  <!-- mission control (right) -->
+  <rect x="1272" y="150" width="280" height="250" rx="14" fill="#101824" stroke="#22303f"/>
+  <text x="1296" y="186" class="lbl">LIVE NOC</text>
+  <text x="1296" y="220" class="h" font-size="20">Mission Control</text>
+  <text x="1296" y="252" class="t" font-size="16">Next.js · React Three Fiber</text>
+  <text x="1296" y="278" class="m" font-size="14">healing pipeline (3D)</text>
+  <text x="1296" y="300" class="m" font-size="14">fleet immunity map</text>
+  <text x="1296" y="322" class="m" font-size="14">governance approval modal</text>
+  <text x="1296" y="362" class="m mono" font-size="13">demo + live mode</text>
+
+  <!-- arrows AI<->operator -->
+  <line x1="300" y1="232" x2="356" y2="232" stroke="#4fd6ff" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="306" y="222" class="m" font-size="12">metrics · traces · GitHub deploys</text>
+  <line x1="356" y1="320" x2="300" y2="320" stroke="#57e0a0" stroke-width="2.5" marker-end="url(#arrG)"/>
+  <text x="300" y="346" class="t" font-size="12" font-weight="700" fill="#57e0a0">remediation · REAL Cloud Run rollback</text>
+
+  <!-- arrow operator->mission control -->
+  <line x1="1212" y1="232" x2="1268" y2="232" stroke="#4fd6ff" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="1216" y="222" class="m" font-size="12">control-plane API · SSE/JSON</text>
+
+  <!-- google cloud band -->
+  <rect x="48" y="600" width="1504" height="96" rx="14" fill="#0c141f" stroke="#1d2a39"/>
+  <text x="72" y="636" class="lbl">GOOGLE CLOUD</text>
+  <g font-size="14" text-anchor="middle">
+    <g><rect x="240" y="620" width="150" height="46" rx="10" fill="#10202c" stroke="#2c4f63"/><text x="315" y="648" class="t">Cloud Run</text></g>
+    <g><rect x="404" y="620" width="160" height="46" rx="10" fill="#10202c" stroke="#2c4f63"/><text x="484" y="648" class="t">Gemini + ADK</text></g>
+    <g><rect x="578" y="620" width="210" height="46" rx="10" fill="#10202c" stroke="#2c4f63"/><text x="683" y="648" class="t">Vertex Gen AI Eval</text></g>
+    <g><rect x="802" y="620" width="246" height="46" rx="10" fill="#0e1a24" stroke="#243240"/><text x="925" y="648" class="m">Monitoring · Logging · Trace</text></g>
+    <g><rect x="1062" y="620" width="110" height="46" rx="10" fill="#0e1a24" stroke="#243240"/><text x="1117" y="648" class="m">Pub/Sub</text></g>
+    <g><rect x="1186" y="620" width="120" height="46" rx="10" fill="#0e1a24" stroke="#243240"/><text x="1246" y="648" class="m">BigQuery</text></g>
+    <g><rect x="1320" y="620" width="120" height="46" rx="10" fill="#0e1a24" stroke="#243240"/><text x="1380" y="648" class="m">Firestore</text></g>
+  </g>
+
+  <!-- three pillars -->
+  <g>
+    <rect x="48" y="724" width="490" height="120" rx="14" fill="#0e1a16" stroke="#2f5d49"/>
+    <text x="72" y="760" class="h" font-size="17">① AI-for-AIOps</text>
+    <text x="72" y="790" class="m" font-size="14">heals the AI-specific failures classic</text>
+    <text x="72" y="812" class="m" font-size="14">monitoring can't even see</text>
+  </g>
+  <g>
+    <rect x="555" y="724" width="490" height="120" rx="14" fill="#120e22" stroke="#3f3470"/>
+    <text x="579" y="760" class="h" font-size="17">② Fleet Immunity</text>
+    <text x="579" y="790" class="m" font-size="14">one incident vaccinates the whole</text>
+    <text x="579" y="812" class="m" font-size="14">fleet — compounding moat</text>
+  </g>
+  <g>
+    <rect x="1062" y="724" width="490" height="120" rx="14" fill="#160e14" stroke="#5a2a3c"/>
+    <text x="1086" y="760" class="h" font-size="17">③ Governance</text>
+    <text x="1086" y="790" class="m" font-size="14">irreversible ops gated on a human —</text>
+    <text x="1086" y="812" class="m" font-size="14">autonomy you can put in production</text>
+  </g>
+
+  <text x="48" y="892" class="m mono" font-size="12">Demo mode: FakeProvider + SimulatedService (deterministic, no GCP).  Cloud mode: real Gemini/ADK + real Cloud Run rollback.  backend: 96 passed/1 skipped · 92% cov · bench PASS.</text>
+</svg>

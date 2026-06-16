@@ -4,6 +4,8 @@
 
 ## System overview
 
+> Rendered diagram: [`architecture.svg`](architecture.svg) (use this image for ProtoPedia / slides).
+
 ```
                          GitHub deploys ┐
  ┌──────────────────┐   metrics/traces  │   ┌──────────── Aegis Operator (autonomous loop) ───────────┐
@@ -51,11 +53,11 @@ Action (rollback/failover/scale/PR) · Reflection (runbook self-improvement) · 
 The whole loop is **provider-agnostic behind protocols** (`Provider`, `Diagnoser`, tool adapters):
 
 - **Demo mode** (default): `FakeProvider` + `SimulatedService` + `RunbookDiagnoser` → deterministic, reproducible, no GCP, demo-safe.
-- **Cloud mode** (`AEGIS_ENV=cloud`): Gemini provider, Gemini-backed diagnoser, ADK wrapper, real Cloud Run / Monitoring / GitHub tool adapters.
+- **Cloud mode** (`AEGIS_DEMO_MODE=false`): Gemini provider, Gemini-backed diagnoser, ADK wrapper, and a **real Cloud Run rollback executor** — a configured target's `ROLLBACK_REVISION` rewrites live traffic via the Admin API (degrading to the simulated twin on any error).
 
 This is why the live demo never flakes on stage — and it's also honest engineering (testability + reliability is literally the product's thesis).
 
 ## Tests
 
-`backend/`: 61 tests, ~96% coverage (TDD). `dashboard/`: typecheck + production build in CI.
+`backend/`: 96 passed / 1 skipped, 92% coverage (TDD). `dashboard/`: typecheck + production build in CI.
 Run: `cd backend && uv run pytest` · `cd dashboard && pnpm build`.

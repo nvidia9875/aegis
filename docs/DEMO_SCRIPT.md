@@ -16,3 +16,5 @@ Backend parity: `cd backend && uv run python -m aegis_platform.demo`.
 | 1:45 | Final board: 4 auto-resolved, 3 antibodies, 60% immunity, 41% router savings | "Autonomous where it's safe, human where it must be, and smarter after every incident. That's Aegis." |
 
 **Why it wins:** autonomous loop (necessity) · DevOps's deepest pain · instantly legible · Governance = production-safe · Fleet Immunity = compounding moat.
+
+**Cloud-mode B-roll (optional, ~15s):** flip `AEGIS_DEMO_MODE=false` and hit `/api/demo/run` — real Gemini RCA writes the root cause in natural language, and a configured target's rollback is a **real Cloud Run traffic rollback** (Admin API). Shows the demo's "Act" is real, not staged. Keep the deterministic demo as the spine; use this as proof B-roll.

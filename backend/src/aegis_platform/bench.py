@@ -1,8 +1,9 @@
 """bench.py — Aegis self-evaluation / benchmark harness (Layer-2 eval).
 
-Proves the autonomous loop *works* with numbers instead of claims. It injects the
-known faults from ``fault_injector.FAULTS`` (the ground truth), runs the real
-``AegisOperator`` loop, and scores the outcome against that ground truth:
+Demonstrates the autonomous loop with numbers against *known ground truth* —
+transparent and deterministic, not a black-box claim. It injects the known faults
+from ``fault_injector.FAULTS`` (the ground truth), runs the real ``AegisOperator``
+loop, and scores the outcome against that ground truth:
 
   • detection rate            — did we notice the anomaly at all?
   • classification accuracy   — did we name the right IncidentClass?
@@ -12,8 +13,11 @@ known faults from ``fault_injector.FAULTS`` (the ground truth), runs the real
   • human-gate respected      — irreversible action waits for approval, then heals
   • Fleet-Immunity mitigations — a repeat failure healed by antibody recall
 
-Pure logic, deterministic, no Google Cloud. The live/cloud-mode benchmark (real
-Gemini RCA, real Cloud Run rollbacks, human-baseline MTTR) is a continuation item.
+Pure logic, deterministic, no Google Cloud. The reported in-loop figure is the
+loop's *decision latency* (compute), not a wall-clock MTTR; real wall-clock MTTR
+under cloud-mode (real Gemini RCA + real Cloud Run rollbacks) is a continuation
+item. The human on-call figure below is an illustrative industry anchor for
+context — not a measured Aegis number.
 
 Run: ``uv run python -m aegis_platform.bench``
 """
@@ -29,6 +33,17 @@ from aegis_platform.operator import AegisOperator, build_monitors
 
 # Revision injected with each fault — the diagnoser should blame exactly this.
 INJECT_REV = "rev-bad"
+
+# Illustrative manual on-call MTTR per fault class (minutes). External context
+# anchor only — NOT a measured Aegis number. Conservative estimates for the time
+# a human takes to detect → triage → correlate with the deploy → roll back.
+_HUMAN_BASELINE_MIN: dict[str, float] = {
+    "groundedness_regression": 45.0,
+    "cost_explosion": 30.0,
+    "latency_degradation": 20.0,
+    "error_spike": 15.0,
+    "corrupted_index": 90.0,
+}
 
 
 @dataclass(frozen=True)
@@ -102,6 +117,12 @@ class BenchmarkReport:
     def mean_mttr_ms(self) -> float:
         vals = [r.mttr_s for r in self.catalog if r.mttr_s is not None]
         return (sum(vals) / len(vals) * 1000.0) if vals else 0.0
+
+    @property
+    def human_baseline_min(self) -> float:
+        """Mean illustrative manual on-call MTTR (minutes) — external context only."""
+        vals = [_HUMAN_BASELINE_MIN[r.fault_id] for r in self.catalog if r.fault_id in _HUMAN_BASELINE_MIN]
+        return (sum(vals) / len(vals)) if vals else 0.0
 
 
 # ── scenario runners ──────────────────────────────────────────────────────────
@@ -254,13 +275,16 @@ def _print_summary(report: BenchmarkReport) -> None:
         ("human gate respected (L2)", "yes" if report.human_gate_respected else "no", report.human_gate_respected),
         ("fleet-immunity mitigations", str(report.immunity_mitigations), report.immunity_mitigations >= 1),
         ("antibodies learned", str(report.antibodies_learned), report.antibodies_learned >= 1),
-        ("mean in-loop MTTR", f"{report.mean_mttr_ms:.2f} ms", True),
+        ("mean in-loop decision latency", f"{report.mean_mttr_ms:.2f} ms", True),
+        ("human on-call MTTR (illustrative)", f"~{report.human_baseline_min:.0f} min", True),
     ]
     print("\n  SCORECARD")
     print("  " + "-" * 56)
     for label, value, ok in rows:
         print(f"  {_check(ok)} {label:<38}{value:>14}")
     print("  " + "-" * 56)
+    print("  decision latency = in-loop compute (deterministic sim); human MTTR = industry anchor.")
+    print("  cloud-mode adds real Gemini RCA + real Cloud Run rollback; wall-clock MTTR = continuation.")
 
 
 def main() -> None:

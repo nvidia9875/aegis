@@ -55,8 +55,19 @@ def test_fleet_immunity_heals_repeat_failure_via_antibody():
     assert recall.resolved is True
 
 
+def test_human_baseline_anchor_present_and_positive():
+    report = run_benchmark()
+    # External context anchor: a positive mean manual MTTR for the speedup story.
+    assert report.human_baseline_min > 0.0
+    assert report.mean_mttr_ms >= 0.0
+
+
 def test_cli_reporter_runs_and_passes(capsys):
     main()
     out = capsys.readouterr().out
     assert "AEGIS BENCHMARK" in out
     assert "VERDICT: PASS" in out
+    # Honest labelling: the sub-second figure is decision latency, not wall-clock MTTR,
+    # and the human number is explicitly an illustrative anchor.
+    assert "decision latency" in out
+    assert "human on-call MTTR (illustrative)" in out

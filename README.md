@@ -56,7 +56,7 @@ idea/         the pitch / idea doc
 ```bash
 # Backend (Python 3.11+ via uv)
 cd backend
-uv sync                       # core deps; add `--extra gcp` for Gemini/ADK/Vertex
+uv sync                       # core deps; add `--extra cloud` for real Gemini+ADK (or `--extra gcp` for Vertex Eval/BigQuery/ES)
 uv run pytest                 # TDD: tests first
 
 # Dashboard

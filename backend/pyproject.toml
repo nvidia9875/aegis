@@ -22,11 +22,13 @@ dependencies = [
 cloud = [
     "google-genai>=1.0",
     "google-adk>=1.0",
+    "google-cloud-run>=0.10",
 ]
 # Heavy Google Cloud / eval / data deps live here so the testable core runs without GCP.
 gcp = [
     "google-genai>=1.0",
     "google-adk>=1.0",
+    "google-cloud-run>=0.10",
     "google-cloud-aiplatform[evaluation]>=1.60",
     "google-cloud-bigquery>=3.25",
     "google-cloud-firestore>=2.16",

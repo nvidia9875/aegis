@@ -61,7 +61,7 @@ export default function Page() {
               AEGIS <span className="mono" style={{ fontSize: 11, color: "var(--color-faint)", letterSpacing: "0.2em" }}>// MISSION CONTROL</span>
             </h1>
             <p className="mono" style={{ margin: "1px 0 0", fontSize: 9.5, color: "var(--color-muted)", letterSpacing: "0.12em" }}>
-              AUTONOMOUS SRE · LIVE SELF-HEAL LOOP
+              AUTONOMOUS SRE FOR AI SERVICES · LIVE SELF-HEAL LOOP
             </p>
           </div>
         </div>

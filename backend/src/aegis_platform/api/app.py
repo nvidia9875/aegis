@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from aegis_platform.api import serializers
 from aegis_platform.api.state import DemoSession
-from aegis_platform.cloud import build_diagnoser
+from aegis_platform.cloud import build_diagnoser, build_executor
 from aegis_platform.common.config import get_settings
 
 app = FastAPI(title="Aegis — Autonomous SRE control plane", version="0.1.0")
@@ -22,10 +22,12 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
-# demo mode → deterministic runbook diagnoser; cloud mode → ADK/Gemini RCA.
+# demo mode → deterministic runbook diagnoser + simulated executor;
+# cloud mode → ADK/Gemini RCA + real Cloud Run rollback executor (if a target is set).
 _session = DemoSession(
     autonomy=get_settings().autonomy,
     diagnoser=build_diagnoser(get_settings()),
+    executor=build_executor(get_settings()),
 )
 
 
@@ -48,6 +50,7 @@ def health() -> dict[str, Any]:
         "status": "ok",
         "demo_mode": get_settings().demo_mode,
         "diagnoser": type(_session.operator.diagnoser).__name__,
+        "executor": type(_session.operator.executor).__name__,
     }
 
 

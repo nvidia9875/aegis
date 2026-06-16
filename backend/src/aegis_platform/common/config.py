@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     # CORS — comma-separated allowed origins for the dashboard (no wildcard in prod).
     allowed_origins: str = Field(default="http://localhost:3000", alias="AEGIS_ALLOWED_ORIGINS")
 
+    # Real Cloud Run remediation target (cloud mode only; empty → simulated executor).
+    # When set, a ROLLBACK_REVISION on this service performs a genuine traffic rollback.
+    cloudrun_target_id: str = Field(default="", alias="AEGIS_CLOUDRUN_TARGET_ID")
+    cloudrun_target_service: str = Field(default="", alias="AEGIS_CLOUDRUN_TARGET_SERVICE")
+    cloudrun_good_revision: str = Field(default="", alias="AEGIS_CLOUDRUN_GOOD_REVISION")
+
     # Stores / integrations (optional; empty → in-memory fallbacks)
     bigquery_dataset: str = Field(default="aegis", alias="BIGQUERY_DATASET")
     elasticsearch_url: str = Field(default="", alias="ELASTICSEARCH_URL")

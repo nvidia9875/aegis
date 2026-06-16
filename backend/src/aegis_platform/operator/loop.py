@@ -27,6 +27,7 @@ from aegis_platform.governance import (
 )
 from aegis_platform.immunity import FleetImmunity
 from aegis_platform.operator.diagnoser import Diagnoser, RunbookDiagnoser
+from aegis_platform.operator.executor import RemediationExecutor, SimulatedExecutor
 from aegis_platform.telemetry import IncidentDetector, MetricMonitor
 
 
@@ -65,6 +66,7 @@ class AegisOperator:
         audit: AuditLog | None = None,
         diagnoser: Diagnoser | None = None,
         detector: IncidentDetector | None = None,
+        executor: RemediationExecutor | None = None,
     ) -> None:
         self.fleet = fleet or FleetImmunity()
         self.gate = gate or GovernanceGate(autonomy)
@@ -72,6 +74,7 @@ class AegisOperator:
         self.audit = audit or AuditLog()
         self.diagnoser = diagnoser or RunbookDiagnoser()
         self.detector = detector or IncidentDetector()
+        self.executor = executor or SimulatedExecutor()
         self._pending: dict[str, dict] = {}
 
     # ── public API ────────────────────────────────────────────────────────────
@@ -204,7 +207,7 @@ class AegisOperator:
         self, service, monitors, incident, remediation, used_antibody, antibody, timeline, label
     ) -> IncidentReport:
         self.audit.record(AuditEntry(incident_id=incident.id, action=remediation, decision=label))
-        recovered = service.apply_action(remediation.type)
+        recovered = self.executor.execute(remediation, service)
         timeline.append(
             f"applied {remediation.type.value} → {'recovered' if recovered else 'no effect'}"
         )

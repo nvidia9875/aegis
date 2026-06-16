@@ -8,7 +8,13 @@ from aegis_platform.api import serializers
 from aegis_platform.common.config import Autonomy
 from aegis_platform.common.schemas import IncidentClass
 from aegis_platform.fault_injector import FAULTS, build_demo_service
-from aegis_platform.operator import AegisOperator, Diagnoser, IncidentReport, build_monitors
+from aegis_platform.operator import (
+    AegisOperator,
+    Diagnoser,
+    IncidentReport,
+    RemediationExecutor,
+    build_monitors,
+)
 
 # Failure-class universe used to compute Fleet Immunity coverage.
 _UNIVERSE: frozenset[IncidentClass] = frozenset({
@@ -21,13 +27,21 @@ _UNIVERSE: frozenset[IncidentClass] = frozenset({
 
 
 class DemoSession:
-    def __init__(self, autonomy: Autonomy = Autonomy.GUARDED, diagnoser: Diagnoser | None = None) -> None:
+    def __init__(
+        self,
+        autonomy: Autonomy = Autonomy.GUARDED,
+        diagnoser: Diagnoser | None = None,
+        executor: RemediationExecutor | None = None,
+    ) -> None:
         self.autonomy = autonomy
         self.diagnoser = diagnoser
+        self.executor = executor
         self.reset()
 
     def reset(self) -> None:
-        self.operator = AegisOperator(autonomy=self.autonomy, diagnoser=self.diagnoser)
+        self.operator = AegisOperator(
+            autonomy=self.autonomy, diagnoser=self.diagnoser, executor=self.executor
+        )
         self.services: dict[str, Any] = {}
         self.reports: list[tuple[str, IncidentReport]] = []
         self._pending_reports: dict[str, IncidentReport] = {}

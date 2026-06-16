@@ -21,6 +21,7 @@
 2. デプロイURL（動作確認可能）: **https://aegis-dashboard-110342587472.us-central1.run.app**（Mission Control）
    - control-plane API: https://aegis-api-110342587472.us-central1.run.app （`/api/health` で稼働モード確認可）
    - 現在 **cloud-mode で稼働**（`/api/health` → `diagnoser: AdkDiagnoser`＝実Gemini＋ADK）。`/api/demo/run` で実RCAが走る（root_causeがLLM生成の自然文・MTTRに実Vertex呼び出しの遅延が出る）。
+   - **実Cloud Runロールバック（Act＝本物）**：`/api/demo/run` の support-rag 障害で、`aegis-run` SA が実ターゲット **`aegis-target`**（us-central1, good=`aegis-target-00001-6bp` / bad=`aegis-target-00002-82w`）のトラフィックを不良→正常リビジョンへ **Admin API で実際にロールバック**。`/api/health` の `executor` が `CloudRunExecutor`。最小IAM＝当該サービスの `run.developer` ＋実行SAへ `actAs` のみ。
 3. ProtoPedia 作品URL: <after registering>
 
 > プロジェクト: `devops-hackathon-499407` / region: `us-central1`。再デプロイは `PROJECT_ID=devops-hackathon-499407 REGION=us-central1 AEGIS_DEMO_MODE=false ./infra/deploy.sh`。

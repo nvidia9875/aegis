@@ -438,3 +438,40 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .particle, .led { animation: none; }
 }
+
+/* ── v4 polish: a11y focus, press feedback, responsive, command clock ────── */
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.seg button:focus-visible,
+.pill:focus-visible {
+  outline: 2px solid var(--color-heal);
+  outline-offset: 2px;
+}
+.btn-primary:active { transform: scale(0.97); }
+.seg button { transition: background 0.15s ease, color 0.15s ease; cursor: pointer; }
+.seg button:not([data-on="true"]):hover { color: var(--color-muted); }
+
+.cmd-clock {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--color-faint);
+}
+
+.metric-hero {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+/* content-priority: shed dense panels on small screens (presentation tool) */
+@media (max-width: 820px) {
+  .hud-log { display: none !important; }
+  .stage-wrap { display: none !important; }
+}
+@media (max-width: 560px) {
+  .hud-incident, .hud-stats { width: calc(100vw - 28px) !important; }
+}

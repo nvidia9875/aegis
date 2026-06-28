@@ -21,8 +21,8 @@ export function GovernanceModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           style={{
-            background: "color-mix(in oklch, var(--color-abyss) 72%, transparent)",
-            backdropFilter: "blur(6px)",
+            background: "color-mix(in oklch, var(--color-abyss) 84%, transparent)",
+            backdropFilter: "blur(7px)",
           }}
         >
           <motion.div

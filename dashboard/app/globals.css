@@ -236,13 +236,12 @@ body::after {
 /* transparent holographic glass — see-through, glowing edge (Passengers style) */
 .hud {
   position: relative;
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklch, var(--hud-tint) 4%, transparent),
-    color-mix(in oklch, var(--hud-tint) 1%, transparent)
-  );
+  /* accent tint over a dark readable base (text legibility over the bright scene) */
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--hud-tint) 13%, transparent), color-mix(in oklch, var(--hud-tint) 4%, transparent)),
+    linear-gradient(180deg, color-mix(in oklch, var(--color-void) 86%, transparent), color-mix(in oklch, var(--color-abyss) 91%, transparent));
   border: 1px solid var(--hud-line);
-  backdrop-filter: blur(7px) saturate(155%);
+  backdrop-filter: blur(8px) saturate(155%);
   clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
   padding: 16px 16px 14px;
   /* outer glow + chromatic edge fringe (follows the clipped silhouette) */

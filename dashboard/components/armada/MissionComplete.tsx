@@ -47,6 +47,8 @@ export function MissionComplete({
             display: "grid",
             placeItems: "center",
             pointerEvents: "none",
+            background: "color-mix(in oklch, var(--color-abyss) 58%, transparent)",
+            backdropFilter: "blur(4px)",
           }}
         >
           <motion.div

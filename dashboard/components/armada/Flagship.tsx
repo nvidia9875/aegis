@@ -48,11 +48,11 @@ export function Flagship({ accent, coverage }: { accent: Accent; coverage: numbe
       </mesh>
       {/* atmospheric aura */}
       <mesh>
-        <sphereGeometry args={[2.7, 24, 24]} />
+        <sphereGeometry args={[2.3, 24, 24]} />
         <meshBasicMaterial
           color={col}
           transparent
-          opacity={0.06}
+          opacity={0.045}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />

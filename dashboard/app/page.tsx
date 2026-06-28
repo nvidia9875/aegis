@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { GovernanceModal } from "@/components/GovernanceModal";
+import { StageTracker } from "@/components/armada/StageTracker";
 import { fetchLiveNarrative } from "@/lib/api";
 import { NARRATIVE, SERVICES } from "@/lib/narrative";
 import type { Accent, Beat, StageId } from "@/lib/types";
@@ -136,6 +137,11 @@ export default function Page() {
           </button>
         </div>
       </header>
+
+      {/* ── self-heal loop tracker ─────────────────────────────────────── */}
+      <div style={{ position: "absolute", top: 64, left: "50%", transform: "translateX(-50%)" }}>
+        <StageTracker active={state.activeStage} lit={state.litStages} />
+      </div>
 
       {/* ── active incident card ───────────────────────────────────────── */}
       {cb && !state.finished && (

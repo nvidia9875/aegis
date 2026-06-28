@@ -37,8 +37,16 @@ export function HealingBeam({ target, active }: { target: Vec3 | null; active: b
   return (
     <group position={mid} quaternion={quaternion} visible={active}>
       <mesh>
-        <cylinderGeometry args={[0.035, 0.035, length, 8, 1, true]} />
-        <meshBasicMaterial ref={mat} color={C.heal} transparent opacity={0} side={THREE.DoubleSide} />
+        <cylinderGeometry args={[0.06, 0.06, length, 10, 1, true]} />
+        <meshBasicMaterial
+          ref={mat}
+          color={C.heal}
+          transparent
+          opacity={0}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );

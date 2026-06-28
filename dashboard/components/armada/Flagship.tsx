@@ -46,6 +46,17 @@ export function Flagship({ accent, coverage }: { accent: Accent; coverage: numbe
         <torusGeometry args={[2.1 + coverage * 0.7, 0.018, 12, 96]} />
         <meshBasicMaterial color={green} transparent opacity={0.35 + coverage * 0.45} />
       </mesh>
+      {/* atmospheric aura */}
+      <mesh>
+        <sphereGeometry args={[2.7, 24, 24]} />
+        <meshBasicMaterial
+          color={col}
+          transparent
+          opacity={0.06}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
       <pointLight color={col} intensity={7} distance={22} decay={1.6} />
     </group>
   );
